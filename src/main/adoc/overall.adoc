@@ -1,0 +1,54 @@
+= 2048 Sliding Block Puzzle – Overall Specification
+:revnumber: 3.0
+:revdate: 2025-01-25
+:toc:
+:toclevels: 2
+
+== 1. Introduction
+
+The 2048 Sliding Block Puzzle now supports **rectangular boards** (e.g., 3×4, 4×5, 6×9), dynamic win-tile logic, and **custom tile spawn probabilities**. We maintain a classic MVC architecture, but the **board size** (xSize, ySize) is selected at startup from a Swing dialog.
+
+The base package is `lost.town.g2k`.
+
+
+== 2. Key Changes in This Version
+
+1. **NxM Board Selection**
+   - The `Main` class prompts for dimension combos like `"3x3"`, `"4x3"`, `"4x4"`, `"5x7"`, or `"9x6"`.
+   - If the user closes/cancels the dialog, a default dimension (`4×4`) is used.
+   - We store `(xSize, ySize)` in `GameConfig` (e.g. 4,4).
+
+2. **Dynamic Win Tile via Switch**
+   - The code sets `winTileValue` based on the chosen dimension. For instance, 4×4 => 2048, 5×5 => 8192.
+   - This switch can be expanded for more combos.
+
+3. **Spawn Probabilities**
+   - `Main` sets 2=80%, 4=15%, 8=4%, 16=1%.
+   - These can be overridden by adjusting `GameConfig.setTileSpawnProbabilities(...)`.
+
+4. **Undo and Key Bindings**
+   - **Undo** is enabled by default, allowing the user to revert one move by pressing **“U”** or using the Undo button in the Swing UI.
+   - The **`SwingGameView`** uses root-pane key bindings for arrow keys, WASD, and Undo, ensuring focus issues do not block user input.
+
+5. **MVC Flow**
+   - `Main` picks the dimension and sets up `GameConfig`, `GameBoard`, `GameController`, and `SwingGameView`.
+   - `GameController.startGame()` calls `SwingGameView.initializeView()`, which builds the grid, sets key bindings, and then calls `controller.resetGame()` to fill the board.
+
+== 3. Impact on Architecture
+
+- **Model** (`GameBoard`, `GameConfig`): Accepts an **xSize** (columns) and **ySize** (rows). Merges/undo logic remain the same, but the arrays are now rectangular.
+- **Controller** (`GameController`): Still orchestrates moves, undo, and high-score logic.
+- **View** (`SwingGameView` / `ConsoleGameView`): Dynamically builds the board GUI (or ASCII) with `ySize` rows and `xSize` columns. Binds keyboard inputs to moves.
+
+== 4. Updated Functional Requirements (Excerpt)
+
+- **Rectangular Board**: The puzzle no longer requires NxN; it can be NxM if specified.
+- **Dimension Prompt**: The user picks from a set of combos (e.g., “6x9”) at startup.
+- **Dynamic Win Condition**: A tile value threshold is assigned via a switch statement in `Main`.
+- **Spawn Probability**: Adjusted to 2=0.8, 4=0.15, 8=0.04, 16=0.01.
+- **Undo Support**: Single-step undo with “U”/Undo button.
+
+== 5. Non-Functional Requirements
+
+Same as before: the game should perform merges quickly and remain maintainable. For large rectangular boards (e.g., 9×6), performance testing might be needed to ensure consistent response times.
+

@@ -1,0 +1,163 @@
+= 2048 Sliding Block Puzzle – README
+:doctype: book
+:author: Peter Lawrey
+:lang: en-GB
+:toc:
+:toclevels: 2
+
+Welcome to the 2048 Sliding Block Puzzle project! This repository contains a Java-based version of the popular 2048 game—enhanced with support for rectangular boards, dynamic tile spawn probabilities, and single-step undo. The game uses a classic Model–View–Controller (MVC) pattern and can run with either a Swing-based GUI or console-based view.
+
+This was created as an exercise in AI assisted development (AIDE) to demonstrate how AI can help developers write better code and documentation. The project is structured to show how to organise code and documentation side by side.
+
+== 1. Overview
+
+This project illustrates how to build and maintain a 2048 puzzle with flexible dimensions (`NxM`), a dynamic win tile, and probability-based tile spawning. It also demonstrates best practices for organising AsciiDoc documentation alongside code. The repository includes:
+
+* **Java Source Code** in `src/main/java/town/lost/g2k/...`
+* **Tests** in `src/test/java/town/lost/g2k/...`
+* **AsciiDoc Documentation** in both `src/main/adoc/` (for game specs) and `aide/` (for AI/workflow/style guidance)
+* **Maven Project Files** (`pom.xml`, etc.)
+* **License Summaries**
+
+=== Key Features
+1. **Rectangular Boards**  
+   Supports 3×3, 4×4, 5×7, 6×9, etc. (not just NxN).
+2. **Dynamic Win Condition**  
+   Tile thresholds (e.g., 2048 for 4×4, 8192 for 5×5) set via a switch statement in `Main.java`.
+3. **Custom Spawn Probabilities**  
+   By default: 2 = 80%, 4 = 15%, 8 = 4%, 16 = 1%.
+4. **Undo Support**  
+   Single-step undo by pressing **U** or clicking Undo in the GUI (if enabled in `GameConfig`).
+5. **MVC Architecture**  
+   Clean separation between `GameBoard` (Model), `GameController` (Controller), and `SwingGameView`/`ConsoleGameView` (View).
+
+== 2. How to Build and Run
+
+=== Prerequisites
+* Java 11 or higher (set in `pom.xml`)
+* Maven 3.x or higher
+
+=== Building from Source
+1. **Clone or Download** this repository to your local machine.
+2. **Open a Terminal** (or command prompt) in the project root folder.
+3. **Compile** and **Test**:
+
+   mvn clean install
+
+This command runs all unit tests in `src/test/java`.
+
+=== Running the Game
+After building, you can run the Swing-based 2048 puzzle in several ways:
+
+==== 1) Using Maven Exec
+
+[source,bash]
+----
+mvn exec:java -Dexec.mainClass=town.lost.g2k.Main
+----
+
+==== 2) Using the Packaged JAR
+1. Package the project:
+
+   mvn clean package
+
+2. Find the JAR in `target/g2k-1.0-SNAPSHOT.jar` (version may vary).
+3. Run:
+
+   java -jar target/g2k-1.0-SNAPSHOT.jar
+
+
+When launched, the **Swing Dialog** will prompt for an `NxM` dimension (e.g., `3x3`, `4x4`, `5x7`, etc.). If you close or cancel the dialog, the game defaults to `4x4`.
+
+== 3. How to Play
+
+=== Objective
+Combine numbered tiles by sliding them around the board until you reach or exceed the “win tile” (for instance, 2048 on a 4×4 board).
+
+=== Controls
+
+* **Arrow Keys** (↑, ↓, ←, →) – Move tiles
+* **WASD** – Alternate keys for Up/Down/Left/Right
+* **U** – Undo (revert one move), if enabled
+* **Undo Button (GUI)** – Same effect as pressing **U**
+
+When two tiles with the same number collide, they merge into one tile whose value is the sum of both. Each merge adds to your **Score** (e.g., merging two 4s = +8 points).
+
+=== Gameplay Flow
+1. **Choose Board Size**  
+   Select an `NxM` dimension (e.g., `4x4`) from the popup.  
+2. **Move Tiles**  
+   Press arrow keys/WASD. Tiles slide as far as possible in that direction and merge if identical.
+3. **Spawn New Tile**  
+   After a valid move, a new tile (2, 4, 8, or 16) appears, following the probabilities in the code.  
+4. **Win Condition**  
+   If you create a tile >= your board’s `winTileValue`, you “WIN.”  
+5. **Lose Condition**  
+   If the board is full and no merges are possible, the game ends.  
+
+=== Undo Feature
+* **Press 'U'** or click the **Undo** button to revert the board and score to the previous state.  
+* Only the **most recent** move can be undone if `undoEnabled` is `true` in `GameConfig`.  
+
+== 4. Project Structure
+
+Below is a high-level view of the folder structure. Some file paths are shown as examples:
+
+----
+.
+├── aide/
+│   ├─ aide-glossary.adoc       (Key terms and definitions)
+│   ├─ aide-style-guide.adoc    (Code and doc style guidelines)
+│   └─ aide-workflow.adoc       (AI-assisted dev workflow)
+├── src/
+│   ├─ main/
+│   │   ├─ adoc/
+│   │   │   ├─ detailed.adoc    (Detailed 2048 requirements)
+│   │   │   └─ overall.adoc     (Overall specification)
+│   │   ├─ java/town/lost/g2k/... (Source code: model, view, controller)
+│   └─ test/java/town/lost/g2k/... (JUnit tests)
+├── pom.xml
+├── LICENSE.adoc                (Apache 2.0 License summary)
+└── README.adoc                 (This file)
+----
+
+== 5. Additional Documentation
+
+For further details, see:
+
+* xref:src/main/adoc/overall.adoc[Overall Specification] – Summary of key changes and features.
+* xref:src/main/adoc/detailed.adoc[Detailed Requirements] – In-depth game mechanics and logic.
+* xref:src/main/adoc/enhancements.adoc[Enhancements] – Improvements from the initial requirements.
+* xref:aide/aide-glossary.adoc[AIDE Glossary] – Project and AI-related terminology.
+* xref:aide/aide-style-guide.adoc[AIDE Style Guide] – Coding standards, naming, and doc guidelines.
+* xref:aide/aide-workflow.adoc[AIDE Workflow] – Recommended iterative approach to doc-driven development.
+
+== 6. Testing
+
+All unit tests reside under `src/test/java/...` and are automatically run by Maven during the `mvn test` or `mvn clean install` lifecycle. Key test classes include:
+
+* `GameBoardTest.java` – Basic merges, scoring, and board initialisation
+* `GameBoardNxMTest.java` – Rectangular board edge cases
+* `GameBoardUndoTest.java` – Single-step undo behaviour
+* `GameControllerTest.java` – Controller logic, high score updates
+* `HighScoreManagerTest.java` – Load/save high scores for different board sizes
+
+== 7. Contributing
+
+1. **Fork** the repository and create feature branches for changes.
+2. **Document** new features in `.adoc` files following the xref:aide-style-guide.adoc[AIDE Style Guide].
+3. **Write Tests** for any new logic, ensuring coverage is at least 80% for critical code.
+4. **Submit a Pull Request** with a clear description of the changes and reference any relevant issues.
+
+== 8. License
+
+This project is licensed under the Apache 2.0 License. A summary is found in `LICENSE.adoc.ad`; see the actual `LICENSE.adoc` (or standard Apache 2.0 text) for complete terms.
+
+== 9. Contact
+
+For questions, suggestions, or feedback:
+
+* Project Author: Peter Lawrey  
+* Issue Tracker: Use the project’s GitHub repository issues page.
+
+Thank you for exploring the 2048 Sliding Block Puzzle. Have fun sliding, merging, and aiming for that next big tile!

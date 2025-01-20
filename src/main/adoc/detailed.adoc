@@ -1,0 +1,76 @@
+= 2048 Sliding Block Puzzle – Detailed Requirements
+:revnumber: 3.1
+:revdate: 2025-01-28
+:toc:
+:toclevels: 3
+
+== 1. Introduction
+
+This AsciiDoc provides a deeper look at how the 2048 puzzle is implemented, including **rectangular boards**, **dynamic spawn probabilities**, **single-step undo**, and now **sliding animations**.
+
+== 2. Functional Requirements
+
+=== 2.1 Board Size Selection
+- On startup, the user is prompted for an NxM dimension (via Swing dialog or console input).
+- Defaults to 4x4 if cancelled.
+
+=== 2.2 Dynamic Win Tile
+- A `switch` statement in `Main` sets `winTileValue` based on the chosen NxM.
+- The game is won when a tile >= `winTileValue` appears.
+
+=== 2.3 Tile Spawn Probabilities
+- Defaults: 2=80%, 4=15%, 8=4%, 16=1%.
+- Configurable in `GameConfig` for custom spawn logic.
+
+=== 2.4 Undo Feature
+- Single-step undo (press 'U' or click "Undo"), if `undoEnabled=true`.
+
+=== 2.5 Sliding Animations (New in v3.1)
+1. **Overview**
+After each move, the game shows a short (~300ms) animation where tiles slide from their old positions to their new positions.
+2. **Naive Matching**
+By default, the code compares the *before* and *after* board states by tile value and location, generating `TileMovement` records.
+- **Caveat**: Identical-value merges can cause confusion.
+- For a robust merge animation, add unique IDs to each tile in the model.
+3. **Implementation Highlights**
+- **GameController** captures the board before calling `model.move()`, then compares it with the final state to produce a list of `TileMovement`.
+- **SwingGameView** runs these movements in `showAnimations(...)` with a `Timer(300ms)` before rendering the final board state.
+
+== 3. Board Initialization and Reset
+
+=== 3.1 NxM Board Array
+- `GameBoard` uses a 2D array `[ySize][xSize]`.
+- Two tiles appear at random empty cells upon reset.
+
+=== 3.2 Undo Snapshot
+- If undo is enabled, each valid move stores a snapshot of the board + score.
+
+== 4. MVC Architecture
+
+- **Model (GameBoard)**: Holds the 2D array, merges tiles, spawns new tiles, tracks score and status.
+- **Controller (GameController)**:
+- Coordinates user moves, calls `model.move(direction)`, triggers undo, checks game status.
+- Gathers `TileMovement` data for sliding animations.
+- **View (SwingGameView)**:
+- Displays the grid via `JLabel`s, captures user input (arrow/WASD), and animates tile slides.
+
+== 5. Additional Enhancements
+
+=== 5.1 Larger Boards
+E.g., 6×9 or 8×8. Confirm performance for big grids.
+
+=== 5.2 Multiple Undos
+Store a stack of previous states, at the cost of memory usage.
+
+=== 5.3 Online Leaderboard
+Optionally post final scores to a remote server.
+
+== 6. Testing
+- Verify dimension parsing (3x4, 4x4, 5x7).
+- Check merges and new tile spawns at correct probabilities.
+- Confirm sliding animations appear for each move.
+- Undo reverts the board to pre-move.
+
+== 7. Conclusion
+The puzzle now offers a more dynamic experience with **sliding animations**, rectangular boards, and flexible spawn rules. For more advanced merges or multi-step animations, consider tile IDs and incremental drawing. The design remains modular, following the MVC pattern, ensuring future extensions and enhancements are straightforward.
+

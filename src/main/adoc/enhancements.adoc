@@ -1,0 +1,58 @@
+= 2048 Enhancements and Advanced Features
+:revnumber: 2.0
+:revdate: 2025-01-20
+:toc:
+:toclevels: 3
+
+== 1. Introduction
+
+Beyond the **baseline** NxN puzzle, single-step undo, and per-size local high scores, this document describes optional features that can further enrich the 2048 experience.
+
+== 2. Larger Boards (8x8 and Beyond)
+
+1. **Goal**: Support boards bigger than 6×6 (like 8×8, 10×10).
+2. **Implementation**:
+- Expand the UI’s dimension prompt or menu.
+- Test merges for performance on bigger boards.
+3. **Risks**: Move times or merges might slow.
+4. **Testing**: Fill large boards, confirm no merges => lost condition.
+
+== 3. Multiple Undos
+
+1. **Overview**: Instead of single-step, store a stack of prior states.
+2. **UI**: Possibly show how many undos are left.
+3. **Memory**: Each snapshot is an NxN array, so big boards cost more memory.
+4. **Testing**: Repeated undo calls across multiple merges.
+
+== 4. Online Leaderboard
+
+1. **Idea**: Compare scores across machines via a web service.
+2. **Data**: Must store username, dimension, final score.
+3. **Security**: Avoid cheating or tampering. Possibly https or tokens.
+4. **UI**: Add a “Show Leaderboard” or “Submit Score” flow.
+
+== 5. Advanced Animations
+
+1. **Animations**: Smooth tile sliding, merging “pop” effect.
+2. **Implementation**: A game loop or a Swing Timer with `TileAnimation` objects.
+3. **Performance**: For bigger boards or slow machines, allow disabling animations.
+
+== 6. Additional Feature Ideas
+
+- **Custom Themes**: Different color sets or tile designs.
+- **Timed Mode**: Limit the user’s total time or time per move.
+- **Event Tiles**: Rare tile spawns with special behavior (like doubling).
+
+== 7. Testing & Risk Analysis
+
+|===
+|Enhancement|Risk|Mitigation
+|Large boards|Performance slowdown|Test with 8×8 or larger. Possibly limit size or optimize merges.
+|Multiple Undos|Increased complexity, memory usage|Limit max undos, thoroughly test repeated merges/spawns.
+|Online Leaderboard|Network errors, security concerns|Handle offline gracefully, use encryption or tokens if storing user data.
+|Animations|Frame rate drops in large boards|Allow disabling. Use a 60fps limit or skip frames.
+|===
+
+== 8. Conclusion
+
+These enhancements can be adopted incrementally to expand the 2048 puzzle’s appeal and replay value. Each feature adds complexity but yields richer gameplay. Refer to **`overall.adoc`** for a top-level overview, or **`detailed.adoc`** for the baseline specification.
