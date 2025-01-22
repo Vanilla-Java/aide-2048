@@ -45,7 +45,30 @@ By default, the code compares the *before* and *after* board states by tile valu
 === 3.2 Undo Snapshot
 - If undo is enabled, each valid move stores a snapshot of the board + score.
 
-== 4. MVC Architecture
+== 4. Colour Updates
+
+=== 4.1 Red–Green Channel Swap
+For certain tile values (≥128), we swapped the **red** and **green** channels, yielding a more vibrant set of greens and blues. For example:
+- 128 => `0xE0EDC8` (was `0xede0c8` originally)
+- 256 => `0xB1F279`
+- 512 => `0x95F563`, etc.
+
+These changes give higher-value tiles a fresh look that contrasts more sharply with the lower-value ones.
+
+=== 4.2 Swapped Colours for Larger Powers of Two
+Tiles beyond 2048 (such as 4096, 8192, 16384, 32768, 65536) also have **swapped** or **shifted** channels for more dramatic hues:
+
+- 4096 => `0x2ec2ed`
+- 8192 => `0x79b1f2`
+- 16384 => `0x6395f5`
+- 32768 => `0x5f7cf6`
+- 65536 => `0x3b5ef6`
+
+=== 4.3 Tile Color Method
+The new method `Tiles.getTileColor(int value)` includes these swapped hex codes. If a tile value exceeds known cases (e.g., > 65536) or is a non-standard power of two, we return a fallback colour (`0xfcea12`).
+
+
+== 5. MVC Architecture
 
 - **Model (GameBoard)**: Holds the 2D array, merges tiles, spawns new tiles, tracks score and status.
 - **Controller (GameController)**:
@@ -54,23 +77,23 @@ By default, the code compares the *before* and *after* board states by tile valu
 - **View (SwingGameView)**:
 - Displays the grid via `JLabel`s, captures user input (arrow/WASD), and animates tile slides.
 
-== 5. Additional Enhancements
+== 6. Additional Enhancements
 
-=== 5.1 Larger Boards
+=== 6.1 Larger Boards
 E.g., 6×9 or 8×8. Confirm performance for big grids.
 
-=== 5.2 Multiple Undos
+=== 6.2 Multiple Undos
 Store a stack of previous states, at the cost of memory usage.
 
-=== 5.3 Online Leaderboard
+=== 6.3 Online Leaderboard
 Optionally post final scores to a remote server.
 
-== 6. Testing
+== 7. Testing
 - Verify dimension parsing (3x4, 4x4, 5x7).
 - Check merges and new tile spawns at correct probabilities.
 - Confirm sliding animations appear for each move.
 - Undo reverts the board to pre-move.
 
-== 7. Conclusion
+== 8. Conclusion
 The puzzle now offers a more dynamic experience with **sliding animations**, rectangular boards, and flexible spawn rules. For more advanced merges or multi-step animations, consider tile IDs and incremental drawing. The design remains modular, following the MVC pattern, ensuring future extensions and enhancements are straightforward.
 
